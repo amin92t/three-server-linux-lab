@@ -1,163 +1,52 @@
-# Three-Server Linux Lab
+# Three-Server Linux Lab: Networking & Administration
 
-A documented three-server Linux lab built on VMware. This project demonstrates Linux system administration, static network configuration, DNS configuration, local hostname resolution, connectivity validation, troubleshooting, and Git/GitHub documentation.
+This project is a hands-on lab environment I built using VMware to practice and demonstrate core Linux system administration and networking principles. The goal was to create a reproducible, multi-node setup that mimics a real-world small-scale data center environment.
 
-## Project Objectives
+## 🛠 Project Overview
+In this lab, I configured a multi-server network focusing on static addressing, gateway routing, and DNS resolution. This wasn't just about connectivity; it was a deep dive into troubleshooting and managing different Linux distributions in a single ecosystem.
 
-- Build a small multi-server Linux environment on VMware.
-- Configure static IPv4 addressing for an internal lab network.
-- Configure a gateway host with upstream and internal network interfaces.
-- Configure DNS resolvers and local hostname resolution.
-- Validate network communication between Linux hosts.
-- Document the complete lab setup as a reproducible portfolio project.
-- Use Git and GitHub to manage and publish technical documentation.
+### Core Objectives:
+* **Network Architecture:** Designed and implemented a static IPv4 internal network.
+* **Gateway Implementation:** Configured a custom gateway node to handle routing between upstream (DHCP) and internal (Static) networks.
+* **Service Configuration:** Set up DNS resolvers and local hostname resolution to ensure seamless communication.
+* **Automation & Documentation:** Managed the entire setup using Git/GitHub, documenting every step for reproducibility.
 
-## Lab Environment
+## 🖥 Lab Environment & Topology
 
+### Node Configuration
 | Hostname | Role | Operating System | Interface | IP Address |
-|---|---|---|---|---|
-| `gateway` | Gateway and upstream-facing node | Ubuntu Server 26.04.1 LTS | `ens32` | `192.168.46.129/24` (DHCP) |
-| `gateway` | Gateway and internal network node | Ubuntu Server 26.04.1 LTS | `ens33` | `192.168.56.10/24` (Static) |
-| `app01` | Application node | Fedora Linux 44 Workstation Edition | `ens160` | `192.168.56.20/24` (Static) |
-| `monitor01` | Monitoring and administration node | Ubuntu Server 26.04.1 LTS | `ens33` | `192.168.56.30/24` (Static) |
+| :--- | :--- | :--- | :--- | :--- |
+| **gateway** | Network Gateway | Ubuntu 26.04.1 LTS | ens32 (Upstream)<br>ens33 (Internal) | 192.168.46.129 (DHCP)<br>192.168.56.10 (Static) |
+| **app01** | Application Node | Fedora 44 | ens160 | 192.168.56.20 (Static) |
+| **monitor01** | Monitoring Node | Ubuntu 26.04.1 LTS | ens33 | 192.168.56.30 (Static) |
 
-## Network Overview
+### Network Layout
+The architecture follows a standard gateway-client model:
+* **Upstream Network:** `192.168.46.0/24` (via Default Gateway `192.168.46.2`)
+* **Internal Lab Network:** `192.168.56.0/24` (Managed by the `gateway` node)
+* **DNS Providers:** `1.1.1.1`, `8.8.8.8`
 
-### Internal Lab Network
+---
 
-```text
-Network: 192.168.56.0/24
-Gateway: 192.168.56.10
-```
+## 📂 Repository Structure
+I've organized this repository to serve as a complete "Runbook." You can find everything from raw configurations to troubleshooting logs:
 
-### Gateway Upstream Network
+* `docs/` — Detailed guides on IP planning, network design, and build instructions.
+* `configs/` — Sanitized configuration files (Netplan, NetworkManager, etc.).
+* `validation/` — My checklist and test results used to verify the lab's stability.
+* `troubleshooting/` — A log of DNS issues encountered and how I resolved them.
+* `screenshots/` — Visual confirmation of the lab setup.
 
-```text
-Network: 192.168.46.0/24
-Interface: ens32
-Address: 192.168.46.129/24
-Address Assignment: DHCP
-Upstream Default Gateway: 192.168.46.2
-```
+## 🧪 Validation & Testing
+To ensure the environment was production-ready, I performed the following checks:
+- [x] Verified static IP assignment and default routes on all nodes.
+- [x] Confirmed inter-node connectivity via `ping`.
+- [x] Tested hostname resolution via `/etc/hosts` and DNS.
+- [x] Validated external internet access through the gateway.
+- [x] Tested SSH connectivity and service reachability.
 
-### DNS Servers
+## ⚠️ Security Note
+**Important:** All configuration files in this repository have been **sanitized**. I have strictly ensured that no sensitive data (passwords, private SSH keys, or API tokens) is committed to this repository.
 
-```text
-1.1.1.1
-8.8.8.8
-```
-
-## Network Topology
-
-```text
-                         Upstream Network
-                         192.168.46.0/24
-                                |
-                     Default Gateway: 192.168.46.2
-                                |
-                gateway - Ubuntu Server 26.04.1 LTS
-                ens32: 192.168.46.129/24 (DHCP)
-                ens33: 192.168.56.10/24  (Static)
-                                |
-             Internal Lab Network: 192.168.56.0/24
-                    /                           \
-                   /                             \
-                  /                               \
-      app01 - Fedora 44                    monitor01 - Ubuntu 26.04
-      ens160: 192.168.56.20/24             ens33: 192.168.56.30/24
-      Role: Application Node                Role: Monitoring Node
-```
-
-## Hostname Resolution
-
-The following local hostname mappings are configured on the lab hosts:
-
-```text
-192.168.56.10 gateway
-192.168.56.20 app01
-192.168.56.30 monitor01
-```
-
-## Repository Structure
-
-```text
-three-server-linux-lab/
-├── README.md
-├── .gitignore
-├── docs/
-│   ├── project-overview.md
-│   ├── ip-plan.md
-│   ├── network-design.md
-│   ├── host-configuration.md
-│   ├── dns-and-hosts.md
-│   └── lab-build-runbook.md
-├── diagrams/
-│   └── network-topology.md
-├── configs/
-│   ├── gateway-netplan.yaml
-│   ├── monitor01-netplan.yaml
-│   ├── app01-networkmanager.md
-│   └── hosts-file-example.txt
-├── validation/
-│   ├── connectivity-tests.md
-│   └── validation-checklist.md
-├── troubleshooting/
-│   └── dns-troubleshooting.md
-└── screenshots/
-    └── README.md
-```
-
-## Technologies Used
-
-- VMware
-- Ubuntu Server 26.04.1 LTS
-- Fedora Linux 44 Workstation Edition
-- Netplan
-- NetworkManager
-- systemd-resolved
-- ping
-- ssh
-- curl
-- tcpdump
-- Git
-- GitHub
-
-## Validation Scope
-
-The lab validation includes the following checks:
-
-- Verify static IP addresses on internal interfaces.
-- Verify the default route on `app01` and `monitor01`.
-- Verify connectivity between all lab hosts using `ping`.
-- Verify hostname resolution using `/etc/hosts`.
-- Verify DNS resolver configuration.
-- Verify external network connectivity.
-- Verify SSH connectivity between lab hosts where SSH is enabled.
-- Document and troubleshoot DNS resolution issues.
-
-## Documentation
-
-- `docs/` - Project overview, IP plan, network design, host configuration, and build runbook.
-- `diagrams/` - Network topology diagrams.
-- `configs/` - Sanitized configuration examples.
-- `validation/` - Connectivity tests and validation checklist.
-- `troubleshooting/` - DNS troubleshooting notes and issue analysis.
-- `screenshots/` - Sanitized screenshots from the VMware lab environment.
-
-## Security Notice
-
-This repository contains sanitized lab documentation only.
-
-The following items must never be committed to Git or GitHub:
-
-- Passwords
-- API tokens
-- Private SSH keys
-- Certificates
-- VPN configuration files
-- Personal data
-- Sensitive production configuration files
-
-## Author
-
-Created as a hands-on Linux system administration and networking lab project.
+---
+*Created as a hands-on Linux system administration and networking lab project.*
